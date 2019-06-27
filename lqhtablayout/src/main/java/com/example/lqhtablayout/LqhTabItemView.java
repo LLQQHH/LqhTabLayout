@@ -374,6 +374,10 @@ public class LqhTabItemView extends FrameLayout {
         return tvTabUnread;
     }
 
+    public LinearLayout getLlTabContent() {
+        return llTabContent;
+    }
+
     public static  class Builder {
         private Context context;
         //正常图标

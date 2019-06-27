@@ -34,6 +34,7 @@
         <attr name="lqh_itemPadContentLR" format="dimension"/>
 
         <!--设置显示器-->
+        <attr name="lqh_indicator_model"></attr>
         <attr name="lqh_indicator_color"></attr>
         <attr name="lqh_indicator_height"></attr>
         <attr name="lqh_indicator_width"></attr>
@@ -44,6 +45,7 @@
         <attr name="lqh_indicator_corner_radius"/>
         <attr name="lqh_indicator_anim_enable"/>
     </declare-styleable>
+    <attr name="lqh_indicator_model" format="integer"></attr>
     <attr name="lqh_indicator_color" format="color"></attr>
     <attr name="lqh_indicator_height" format="dimension"></attr>
     <attr name="lqh_indicator_width" format="dimension"></attr>

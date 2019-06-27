@@ -43,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(int position) {
                 showToast("lqhTab1_onTabSelected" + position);
+                if(position==0){
+                    lqhTab0.setUnReadNum(0,0);
+                }else if(position==1){
+                    lqhTab0.setUnReadMes(1,"a");
+                }else{
+                    lqhTab0.setUnReadNum(0,11);
+                    lqhTab0.setUnReadMes(1,"bb");
+                    lqhTab0.setUnReadNum(2,100);
+                }
             }
 
             @Override

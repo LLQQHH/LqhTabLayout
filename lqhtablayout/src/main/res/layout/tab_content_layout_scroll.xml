@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.lqhtablayout.widget.lqhHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fadingEdge="none"
     android:scrollbars="none">
-        <LinearLayout
+        <com.example.lqhtablayout.widget.LqhLinearLayout
             android:id="@+id/lin_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal" />
-</com.example.lqhtablayout.widget.lqhHorizontalScrollView>
+</HorizontalScrollView>

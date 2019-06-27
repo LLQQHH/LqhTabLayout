@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import com.example.lqhtablayout.model.PositionData;
@@ -26,6 +28,7 @@ import com.example.lqhtablayout.model.TabItemData;
 import com.example.lqhtablayout.tabinterface.IPagerChangeListener;
 import com.example.lqhtablayout.utils.DataUtils;
 import com.example.lqhtablayout.utils.UIUtils;
+import com.example.lqhtablayout.widget.LqhLinearLayout;
 import com.example.lqhtablayout.widget.lqhHorizontalScrollView;
 
 import java.util.ArrayList;
@@ -36,14 +39,20 @@ import java.util.List;
  *
  * @describe:
  */
-public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, lqhHorizontalScrollView.OnDrawListener {
+public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, LqhLinearLayout.OnDrawListener {
     private static final String TAG = "LqhTabLayout";
     //是否为滑动模式
     private boolean isScrollMode;
+    public static final int MODE_MATCH = 0;   // 直线宽度 == item宽度
+    public static final int MODE_WRAP= 1;    // 直线宽度 == item内容宽度
+    public static final int MODE_EXACTLY = 2;  // 直线宽度 == mIndicatorWidth
+    private int mMode;  // 默认为MODE_MATCH模式
+
+
     //滑动模式下才存在
-    private lqhHorizontalScrollView mScrollView;
+    private HorizontalScrollView mScrollView;
     //存放内容主布局,用来加TabItemView的
-    private LinearLayout linContent;
+    private LqhLinearLayout linContent;
     //tab的个数
     private final ArrayList<Tab> tabs = new ArrayList<>();
     //item的位置信息
@@ -98,7 +107,6 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
     private float mIndicatorMarginBottom;
     private boolean mIndicatorAnimEnable;
     private boolean isSpaceEqual;
-    private LinearLayout lin_indicator;
 
     public LqhTabLayout(Context context) {
         this(context, null);
@@ -130,8 +138,10 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
             unreadTextBg = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextBg,UIUtils.getColor(context,R.color.selected_ff0000));
             itemPadTB = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemContentPadTB,0);
             itemPadLR = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemPadContentLR,0);
-            //下标宽度 若为0则跟随item大小
-            mIndicatorWidth = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_width, -1);
+            //下标样式
+            mMode = ta.getInteger(R.styleable.LqhTabLayout_lqh_indicator_model, 0);
+            //下标宽度
+            mIndicatorWidth = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_width, UIUtils.dip2Px(context,5));
             //下标高度大于0才显示指示器
             mIndicatorHeight = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_height, -1);
             //下标圆角
@@ -221,9 +231,8 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
         //不滑动没有这个View
         mScrollView = findViewById(R.id.scroll_view);
         linContent = findViewById(R.id.lin_content);
-        if(mScrollView!=null){
-            mScrollView.setOnDrawListener(this);
-        }
+        linContent.setOnDrawListener(this);
+
     }
 
     public void addView(View child) {
@@ -307,26 +316,27 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
         float rightX;
         float nextRightX;
         //表示固定指示器长度
-        if (mIndicatorWidth > 0) {
+        if (mMode==MODE_EXACTLY) {
             leftX = current.mLeft + (current.width() - mIndicatorWidth) / 2;
             nextLeftX = next.mLeft + (next.width() - mIndicatorWidth) / 2;
             rightX = current.mLeft + (current.width() + mIndicatorWidth) / 2;
             nextRightX = next.mLeft + (next.width() + mIndicatorWidth) / 2;
-        } else {
+        } else if(mMode==MODE_MATCH){
             leftX = current.mLeft + mIndicatorMarginLeft;
             nextLeftX = next.mLeft + mIndicatorMarginLeft;
             rightX = current.mRight - mIndicatorMarginRight;
             nextRightX = next.mRight - mIndicatorMarginRight;
+        }else{
+            leftX = current.mContentLeft + mIndicatorMarginLeft;
+            nextLeftX = next.mContentLeft + mIndicatorMarginLeft;
+            rightX = current.mContentRight - mIndicatorMarginRight;
+            nextRightX = next.mContentRight - mIndicatorMarginRight;
         }
         mIndicatorRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
         mIndicatorRect.right = rightX + (nextRightX - rightX) * mEndInterpolator.getInterpolation(positionOffset);
         mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginTop;
         mIndicatorRect.bottom = getHeight() - mIndicatorMarginBottom;
-        if(mScrollView!=null){
-            mScrollView.invalidate();
-        }else{
-            invalidate();
-        }
+        linContent.invalidate();
          //手指跟随滚动
         if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
                 int currentPosition = Math.min(mPositionDataList.size() - 1, position);
@@ -616,10 +626,10 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
                 data.mTop = tabs.get(i).getLqhTabItemView().getTop();
                 data.mRight = tabs.get(i).getLqhTabItemView().getRight();
                 data.mBottom = tabs.get(i).getLqhTabItemView().getBottom();
-                data.mContentLeft = data.mLeft;
+                data.mContentLeft = data.mLeft+data.width()/2-tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth()/2;
                 data.mContentTop = data.mTop;
-                data.mContentRight = data.mRight;
-                data.mContentBottom = data.mBottom;
+                data.mContentRight = data.mLeft+data.width()/2+tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth()/2;
+                data.mContentBottom =  data.mBottom;
             } else {
                 data.mLeft = tabs.get(i).getCustomView().getLeft();
                 data.mTop = tabs.get(i).getCustomView().getTop();
@@ -649,18 +659,6 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(mScrollView!=null){
-            return;
-        }
-        if (
-            //isInEditMode()||
-                tabs.size() == 0) {
-            return;
-        }
-        if (mIndicatorHeight > 0) {
-            //大于零要画下标
-            canvas.drawRoundRect(mIndicatorRect,mIndicatorCornerRadius,mIndicatorCornerRadius, mPaint);
-        }
     }
 
     @Override

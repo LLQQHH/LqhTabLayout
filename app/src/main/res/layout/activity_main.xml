@@ -117,12 +117,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:lqh_scroll_mode="true"
-        app:lqh_space_equal="true"
+        app:lqh_space_equal="false"
         app:lqh_indicator_anim_enable="true"
         android:id="@+id/lqh_tab2"
         app:lqh_indicator_color="@android:color/holo_blue_dark"
         app:lqh_indicator_height="4dp"
         app:lqh_indicator_corner_radius="2dp"
+        app:lqh_indicator_model="1"
         android:background="@color/c_F6CE59"
         >
         <com.example.lqhtablayout.LqhTabItemView
@@ -200,6 +201,7 @@
         app:lqh_indicator_height="4dp"
         app:lqh_indicator_corner_radius="2dp"
         android:background="@color/c_009688"
+        app:lqh_indicator_model="1"
         >
         <com.example.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
