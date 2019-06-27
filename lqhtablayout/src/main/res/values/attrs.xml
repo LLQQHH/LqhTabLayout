@@ -11,6 +11,29 @@
     <declare-styleable name="LqhTabLayout">
         <attr name="lqh_scroll_mode" format="boolean"></attr>
         <attr name="lqh_space_equal" format="boolean"></attr>
+            <!--全局Tabitem设置-->
+        <!--默认状态下的文字颜色-->
+        <attr name="lqh_itemNormalTextColor" format="color"/>
+        <!--选中状态下的文字颜色-->
+        <attr name="lqh_itemSelectedColor" format="color"/>
+        <!--默认状态下的大小-->
+        <attr name="lqh_itemNormalTextSize" format="dimension"/>
+        <!--选中状态下的文字大小-->
+        <attr name="lqh_itemSelectedTextSize" format="dimension"/>
+        <!--设置未读数字体大小-->
+        <attr name="lqh_itemUnreadTextSize" format="dimension"/>
+        <!--设置未读数字体颜色-->
+        <attr name="lqh_itemUnreadTextColor" format="reference"/>
+        <!--设置未读数背景色-->
+        <attr name="lqh_itemUnreadTextBg" format="color|reference"/>
+        <!--文字和图标的顶部距离-->
+        <attr name="lqh_itemIconMargin" format="dimension"/>
+        <!--上下padding-->
+        <attr name="lqh_itemContentPadTB" format="dimension"/>
+        <!--左右padding-->
+        <attr name="lqh_itemPadContentLR" format="dimension"/>
+
+        <!--设置显示器-->
         <attr name="lqh_indicator_color"></attr>
         <attr name="lqh_indicator_height"></attr>
         <attr name="lqh_indicator_width"></attr>
@@ -37,9 +60,9 @@
         <attr name="itemNormalIcon" format="reference"/>
         <!--选中状态下的图标-->
         <attr name="itemSelectedIcon" format="reference"/>
+        <attr name="itemText" format="string"></attr>
         <!--默认状态下的文字颜色-->
         <attr name="itemNormalTextColor" format="color"/>
-        <attr name="itemText" format="string"></attr>
         <!--选中状态下的文字颜色-->
         <attr name="itemSelectedColor" format="color"/>
         <!--默认状态下的大小-->

@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -20,12 +19,13 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import com.example.lqhtablayout.model.PositionData;
+import com.example.lqhtablayout.model.TabItemData;
 import com.example.lqhtablayout.tabinterface.IPagerChangeListener;
 import com.example.lqhtablayout.utils.DataUtils;
+import com.example.lqhtablayout.utils.UIUtils;
 import com.example.lqhtablayout.widget.lqhHorizontalScrollView;
 
 import java.util.ArrayList;
@@ -61,6 +61,26 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
     // 控制动画
     private ValueAnimator mScrollAnimator;
     private float mScrollPivotX = 0.5f; // 滚动中心点 0.0f - 1.0f
+
+
+    //正常文本颜色
+    private int normalColor;
+    //选中的文本颜色
+    private int selectedColor;
+    //正常文本大小
+    private int normalTextSize = 10; //10sp
+    //选择的文本大小
+    private int selectedTextSize = 10; //10sp
+    //文字和图标的距离
+    private int iconMargin=0;//默认距离dp
+    //小红点字体大小
+    private int unReadTextSize=8;//默认8Sp
+    //小红点文字颜色
+    private int unreadTextColor;
+    //小红点背景颜色
+    private int unreadTextBg;
+    private int itemPadTB;
+    private int itemPadLR;
     /**
      * 用于绘制显示器
      */
@@ -99,7 +119,18 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.LqhTabLayout);
             isScrollMode = ta.getBoolean(R.styleable.LqhTabLayout_lqh_scroll_mode, false);
             isSpaceEqual = ta.getBoolean(R.styleable.LqhTabLayout_lqh_space_equal, true);
-            //下标宽度 若为0则跟随文字大小
+            //全局item设置
+            normalColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemNormalTextColor, UIUtils.getColor(context,R.color.default_999999));
+            selectedColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemSelectedColor,UIUtils.getColor(context,R.color.selected_ff0000));
+            normalTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemNormalTextSize, UIUtils.sp2px(context, normalTextSize));
+            selectedTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemSelectedTextSize, UIUtils.sp2px(context, selectedTextSize));
+            iconMargin = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemIconMargin, UIUtils.dip2Px(context, iconMargin));
+            unReadTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemUnreadTextSize, UIUtils.sp2px(context, unReadTextSize));
+            unreadTextColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextColor, UIUtils.getColor(context, R.color.white));
+            unreadTextBg = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextBg,UIUtils.getColor(context,R.color.selected_ff0000));
+            itemPadTB = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemContentPadTB,0);
+            itemPadLR = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemPadContentLR,0);
+            //下标宽度 若为0则跟随item大小
             mIndicatorWidth = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_width, -1);
             //下标高度大于0才显示指示器
             mIndicatorHeight = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_height, -1);
@@ -225,7 +256,25 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
             return;
         }
         tabs.add(tab);
+        configTabItemView(tab);
         addTaItemView(tab.getCustomView() == null ? tab.getLqhTabItemView() : tab.getCustomView());
+    }
+    //配置全局TabItemView属性
+    private void configTabItemView(Tab tab) {
+        if(tab.getLqhTabItemView()!=null){
+            LqhTabItemView lqhTabItemView = tab.getLqhTabItemView();
+            lqhTabItemView.setNormalColor(normalColor,true);
+            lqhTabItemView.setSelectedColor(selectedColor,true);
+            lqhTabItemView.setNormalTextSize(normalTextSize,true);
+            lqhTabItemView.setSelectedTextSize(selectedTextSize,true);
+            lqhTabItemView.setIconMargin(iconMargin,true);
+            lqhTabItemView.setUnReadTextSize(unReadTextSize,true);
+            lqhTabItemView.setUnreadTextColor(unreadTextColor,true);
+            lqhTabItemView.setUnreadTextBg(unreadTextBg,true);
+            lqhTabItemView.setItemPadTB(itemPadTB,true);
+            lqhTabItemView.setItemPadLR(itemPadLR,true);
+            lqhTabItemView.updateStyle();
+        }
     }
 
 
@@ -271,7 +320,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
         }
         mIndicatorRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
         mIndicatorRect.right = rightX + (nextRightX - rightX) * mEndInterpolator.getInterpolation(positionOffset);
-        mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginBottom;
+        mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginTop;
         mIndicatorRect.bottom = getHeight() - mIndicatorMarginBottom;
         if(mScrollView!=null){
             mScrollView.invalidate();
@@ -392,7 +441,6 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
         if (mIndicatorHeight > 0) {
             //大于零要画下标
             canvas.drawRoundRect(mIndicatorRect,mIndicatorCornerRadius,mIndicatorCornerRadius, mPaint);
-            Log.e("当前Tab的left：",""+linContent.getChildAt(mCurrentTabPosition).getLeft());
         }
     }
     public static class Tab {
@@ -585,6 +633,18 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
             mPositionDataList.add(data);
         }
     }
+    public  void addTabItemDataList(List<TabItemData> datas){
+        tabs.clear();
+        linContent.removeAllViews();
+        for(TabItemData data:datas){
+            LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this.getContext());
+            LqhTabItemView lqhTabItemView = builder.setSelectedIcon(data.getSelectedIcon())
+                    .setNormalIcon(data.getNormalIcon())
+                    .setItemText(data.getText()).build();
+            Tab tab = new Tab(lqhTabItemView);
+            this.addTab(tab);
+        }
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -600,7 +660,6 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
         if (mIndicatorHeight > 0) {
             //大于零要画下标
             canvas.drawRoundRect(mIndicatorRect,mIndicatorCornerRadius,mIndicatorCornerRadius, mPaint);
-            Log.e("当前Tab的left：",""+linContent.getChildAt(mCurrentTabPosition).getLeft());
         }
     }
 

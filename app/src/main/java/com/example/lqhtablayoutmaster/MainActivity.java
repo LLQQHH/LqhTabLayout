@@ -1,19 +1,20 @@
 package com.example.lqhtablayoutmaster;
 
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.lqhtablayout.LqhTabItemView;
 import com.example.lqhtablayout.LqhTabLayout;
+import com.example.lqhtablayout.model.TabItemData;
 import com.example.lqhtablayout.utils.UIUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private LqhTabLayout lqhTab0;
@@ -23,8 +24,9 @@ public class MainActivity extends AppCompatActivity {
     private LqhTabLayout lqhTab4;
     private LqhTabLayout lqhTab5;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-    private  String[] mTitles = {
+    private String[] mTitles = {
             "Php", "IOS", "Android"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,35 +42,33 @@ public class MainActivity extends AppCompatActivity {
         lqhTab1.addOnTabSelectedListener(new LqhTabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
-                showToast("lqhTab1_onTabSelected"+position);
+                showToast("lqhTab1_onTabSelected" + position);
             }
 
             @Override
             public void onTabUnselected(int position) {
-                showToast("lqhTab1_onTabUnselected"+position);
+                showToast("lqhTab1_onTabUnselected" + position);
             }
 
             @Override
             public void onTabReselected(int position) {
-                showToast("lqhTab1_onTabReselected"+position);
+                showToast("lqhTab1_onTabReselected" + position);
             }
         });
         int itemCount = lqhTab1.getItemCount();
-        mTitles=new String[itemCount];
-        for(int i=0;i<itemCount;i++)
-        {
-            if(i%2==0){
-                mTitles[i]=i+"Php";
-            }else if(i%2==1){
-                mTitles[i]=i+"IOS";
-            }else{
-                mTitles[i]=i+"Android";
+        mTitles = new String[itemCount];
+        for (int i = 0; i < itemCount; i++) {
+            if (i % 2 == 0) {
+                mTitles[i] = i + "Php";
+            } else if (i % 2 == 1) {
+                mTitles[i] = i + "IOS";
+            } else {
+                mTitles[i] = i + "Android";
             }
 
         }
-        for(int i=0;i<mTitles.length;i++)
-        {
-            mFragments.add(SimpleCardFragment.getInstance(i,mTitles[i]));
+        for (int i = 0; i < mTitles.length; i++) {
+            mFragments.add(SimpleCardFragment.getInstance(i, mTitles[i]));
         }
         vp.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         lqhTab0.setViewPager(vp);
@@ -81,26 +81,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void addLqhTab() {
         int itemCount = lqhTab1.getItemCount();
-         for(int i=0;i<itemCount;i++)
-          {
-              LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this);
-              builder.setItemText("测试"+(i+1));
-              builder.setItemPadTB(UIUtils.dip2Px(this,5));
-              if(i%2==0){
-                  builder.setSelectedIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_pitchon));
-                  builder.setNormalIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_normalcy));
-              }else{
-                  builder.setSelectedIcon(UIUtils.getDrawable(this,R.drawable.ic_main_address_pitchon));
-                  builder.setNormalIcon(UIUtils.getDrawable(this,R.drawable.ic_main_address_normalcy));
-              }
-              lqhTab5.addTab(new LqhTabLayout.Tab(builder.build()));
-          }
+        List<TabItemData> lists = new ArrayList<>();
+        for (int i = 0; i < itemCount; i++) {
+            TabItemData data = new TabItemData("测试" + (i + 1));
+            if (i % 2 == 0) {
+                data.setSelectedIcon(UIUtils.getDrawable(this, R.drawable.ic_main_msg_pitchon));
+                data.setNormalIcon(UIUtils.getDrawable(this, R.drawable.ic_main_msg_normalcy));
+            } else {
+                data.setSelectedIcon(UIUtils.getDrawable(this, R.drawable.ic_main_address_pitchon));
+                data.setNormalIcon(UIUtils.getDrawable(this, R.drawable.ic_main_address_normalcy));
+            }
+            lists.add(data);
+//              LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this);
+//              builder.setItemText("测试"+(i+1));
+//              builder.setItemPadTB(UIUtils.dip2Px(this,5));
+//              if(i%2==0){
+//                  builder.setSelectedIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_pitchon));
+//                  builder.setNormalIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_normalcy));
+//              }else{
+//                  builder.setSelectedIcon(UIUtils.getDrawable(this,R.drawable.ic_main_address_pitchon));
+//                  builder.setNormalIcon(UIUtils.getDrawable(this,R.drawable.ic_main_address_normalcy));
+//              }
+//              lqhTab5.addTab(new LqhTabLayout.Tab(builder.build()));
+        }
+        lqhTab5.addTabItemDataList(lists);
     }
 
     private void showToast(String text) {
-        Toast.makeText(this,text,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
-    private  class MyPagerAdapter extends FragmentPagerAdapter {
+
+    private class MyPagerAdapter extends FragmentPagerAdapter {
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);

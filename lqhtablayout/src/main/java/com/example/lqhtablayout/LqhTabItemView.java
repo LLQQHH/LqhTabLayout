@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -33,13 +34,13 @@ public class LqhTabItemView extends FrameLayout {
     //选中的文本颜色
     private int selectedColor;
     //正常文本大小
-    private int normalTextSize = 10; //10sp
+    private int normalTextSize; //10sp
     //选择的文本大小
-    private int selectedTextSize = 10; //10sp
+    private int selectedTextSize; //10sp
     //文字和图标的距离
-    private int iconMargin=2;//默认距离dp
+    private int iconMargin;//默认距离dp
     //小红点字体大小
-    private int unReadTextSize=8;//默认8Sp
+    private int unReadTextSize;//默认8Sp
     //小红点文字颜色
     private int unreadTextColor;
     //小红点背景颜色
@@ -52,7 +53,7 @@ public class LqhTabItemView extends FrameLayout {
     private LinearLayout llTabContent;
 
     //不能直接创建
-    private LqhTabItemView(Context context) {
+    public LqhTabItemView(Context context) {
         this(context,null);
     }
 
@@ -89,14 +90,14 @@ public class LqhTabItemView extends FrameLayout {
             normalIcon = ta.getDrawable(R.styleable.LqhTabItemView_itemNormalIcon);
             selectedIcon = ta.getDrawable(R.styleable.LqhTabItemView_itemSelectedIcon);
             itemText = ta.getString(R.styleable.LqhTabItemView_itemText);
-            normalColor = ta.getColor(R.styleable.LqhTabItemView_itemNormalTextColor, UIUtils.getColor(context,R.color.default_999999));
-            selectedColor = ta.getColor(R.styleable.LqhTabItemView_itemSelectedColor,UIUtils.getColor(context,R.color.selected_ff0000));
-             normalTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemNormalTextSize, UIUtils.sp2px(context, normalTextSize));
-            selectedTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemSelectedTextSize, UIUtils.sp2px(context, selectedTextSize));
-            iconMargin = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemIconMargin, UIUtils.dip2Px(context, iconMargin));
-            unReadTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemUnreadTextSize, UIUtils.sp2px(context, unReadTextSize));
-            unreadTextColor = ta.getColor(R.styleable.LqhTabItemView_itemUnreadTextColor, UIUtils.getColor(context, R.color.white));
-            unreadTextBg = ta.getColor(R.styleable.LqhTabItemView_itemUnreadTextBg,UIUtils.getColor(context,R.color.selected_ff0000));
+            normalColor = ta.getColor(R.styleable.LqhTabItemView_itemNormalTextColor,0);
+            selectedColor = ta.getColor(R.styleable.LqhTabItemView_itemSelectedColor,0);
+             normalTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemNormalTextSize, 0);
+            selectedTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemSelectedTextSize, 0);
+            iconMargin = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemIconMargin, 0);
+            unReadTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemUnreadTextSize, 0);
+            unreadTextColor = ta.getColor(R.styleable.LqhTabItemView_itemUnreadTextColor, 0);
+            unreadTextBg = ta.getColor(R.styleable.LqhTabItemView_itemUnreadTextBg,0);
             itemPadTB = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemContentPadTB,0);
             itemPadLR = ta.getDimensionPixelSize(R.styleable.LqhTabItemView_itemPadContentLR,0);
             ta.recycle();
@@ -106,7 +107,6 @@ public class LqhTabItemView extends FrameLayout {
     private void initView() {
         View view = getView();
         this.addView(view);
-        initialize();
     }
 
     private View  getView() {
@@ -124,14 +124,17 @@ public class LqhTabItemView extends FrameLayout {
        }else{
            ivTabIcon.setVisibility(View.GONE);
        }
-        tvTabTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,(isSelected?selectedTextSize:normalTextSize));
-        tvTabTitle.setTextColor(isSelected?selectedColor:normalColor);
+       if(normalTextSize!=0&&selectedTextSize!=0){
+           tvTabTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,(isSelected?selectedTextSize:normalTextSize));
+       }
+       if(selectedColor!=0&&normalColor!=0){
+           tvTabTitle.setTextColor(isSelected?selectedColor:normalColor);
+       }
     }
     public void setUnReadMes(String text,int dpRXOffset,int dpTYOffset){
         tvTabUnread.setVisibility(View.VISIBLE);
         UIUtils.show(tvTabUnread,text,unreadTextBg,8,0, Color.parseColor("#ffffff"));
         UIUtils.setUnReadLocation(tvTabUnread,dpRXOffset,dpTYOffset);
-
     }
     public void setUnReadNum(int num,int dpRXOffset,int dpTYOffset){
         tvTabUnread.setVisibility(View.VISIBLE);
@@ -145,11 +148,17 @@ public class LqhTabItemView extends FrameLayout {
 
 
 
-    public void initialize(){
+    public void updateStyle(){
         llTabContent.setPadding(itemPadLR,itemPadTB,itemPadLR,itemPadTB);
-        tvTabTitle.setText(itemText);
-        tvTabTitle.setTextColor(normalColor);
-        tvTabTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,normalTextSize);
+        if(!TextUtils.isEmpty(itemText)){
+            tvTabTitle.setText(itemText);
+        }
+        if(normalColor!=0){
+            tvTabTitle.setTextColor(normalColor);
+        }
+        if(normalTextSize!=0){
+            tvTabTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,normalTextSize);
+        }
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) tvTabTitle.getLayoutParams();
         layoutParams.topMargin=iconMargin;
         if(normalIcon!=null){
@@ -158,16 +167,201 @@ public class LqhTabItemView extends FrameLayout {
         }else{
             ivTabIcon.setVisibility(View.GONE);
         }
-        tvTabUnread.setTextSize(TypedValue.COMPLEX_UNIT_PX,unReadTextSize);
-        tvTabUnread.setTextColor(unreadTextColor);
-        tvTabUnread.setBackgroundColor(unreadTextBg);
+        if(unReadTextSize!=0){
+            tvTabUnread.setTextSize(TypedValue.COMPLEX_UNIT_PX,unReadTextSize);
+        }
+        if(unreadTextColor!=0){
+            tvTabUnread.setTextColor(unreadTextColor);
+        }
+      if(unreadTextBg!=0){
+          tvTabUnread.setBackgroundColor(unreadTextBg);
+      }
+    }
+
+    public Drawable getNormalIcon() {
+        return normalIcon;
+    }
+
+    public void setNormalIcon(Drawable normalIcon) {
+        this.normalIcon = normalIcon;
+    }
+
+    public Drawable getSelectedIcon() {
+        return selectedIcon;
+    }
+
+    public void setSelectedIcon(Drawable selectedIcon) {
+        this.selectedIcon = selectedIcon;
+    }
+
+    public String getItemText() {
+        return itemText;
+    }
+
+    public void setItemText(String itemText) {
+        this.itemText = itemText;
+    }
+
+    public int getNormalColor() {
+        return normalColor;
+    }
+
+    public void setNormalColor(int normalColor) {
+        this.setNormalColor(normalColor,false);
+    }
+    public void setNormalColor(int normalColor, boolean needJudge) {
+
+        if (needJudge) {
+            //判断是否要用全局颜色
+            if (this.normalColor == 0) {
+                this.normalColor = normalColor;
+            }
+        } else {
+            this.normalColor = normalColor;
+        }
+    }
+
+    public int getSelectedColor() {
+        return selectedColor;
+    }
+
+    public void setSelectedColor(int selectedColor) {
+        this.setSelectedColor(selectedColor,false);
+    }
+    public void setSelectedColor(int selectedColor, boolean needJudge) {
+        if (needJudge) {
+            if (this.selectedColor == 0) {
+                this.selectedColor = selectedColor;
+            }
+        } else {
+            this.selectedColor = selectedColor;
+        }
+    }
+
+    public int getNormalTextSize() {
+        return normalTextSize;
+    }
+    public void setNormalTextSize(int normalTextSize) {
+        this.setNormalTextSize(normalTextSize,false);
+    }
+    public void setNormalTextSize(int normalTextSize, boolean needJudge) {
+        if (needJudge) {
+            if (this.normalTextSize == 0) {
+                this.normalTextSize = normalTextSize;
+            }
+        } else {
+            this.normalTextSize = normalTextSize;
+        }
+    }
+    public int getSelectedTextSize() {
+        return selectedTextSize;
+    }
+    public void setSelectedTextSize(int selectedTextSize) {
+        this.setNormalTextSize(selectedTextSize,false);
+    }
+    public void setSelectedTextSize(int selectedTextSize, boolean needJudge) {
+        if (needJudge) {
+            if (this.selectedTextSize == 0) {
+                this.selectedTextSize = selectedTextSize;
+            }
+        } else {
+            this.selectedTextSize = selectedTextSize;
+        }
+    }
+
+    public int getIconMargin() {
+        return iconMargin;
+    }
+    public void setIconMargin(int iconMargin) {
+        this.setNormalTextSize(iconMargin,false);
+    }
+    public void setIconMargin(int iconMargin, boolean needJudge) {
+        if (needJudge) {
+            if (this.iconMargin == 0) {
+                this.iconMargin = iconMargin;
+            }
+        } else {
+            this.iconMargin = iconMargin;
+        }
+    }
+    public int getUnReadTextSize() {
+        return unReadTextSize;
+    }
+    public void setUnReadTextSize(int unReadTextSize) {
+        this.setNormalTextSize(unReadTextSize,false);
+    }
+    public void setUnReadTextSize(int unReadTextSize, boolean needJudge) {
+        if (needJudge) {
+            if (this.unReadTextSize == 0) {
+                this.unReadTextSize = unReadTextSize;
+            }
+        } else {
+            this.unReadTextSize = unReadTextSize;
+        }
+    }
+    public int getUnreadTextColor() {
+        return unreadTextColor;
+    }
+    public void setUnreadTextColor(int unreadTextColor) {
+        this.setNormalTextSize(unreadTextColor,false);
+    }
+    public void setUnreadTextColor(int unreadTextColor, boolean needJudge) {
+        if (needJudge) {
+            if (this.unreadTextColor == 0) {
+                this.unreadTextColor = unreadTextColor;
+            }
+        } else {
+            this.unreadTextColor = unreadTextColor;
+        }
+    }
+    public int getUnreadTextBg() {
+        return unreadTextBg;
+    }
+    public void setUnreadTextBg(int unreadTextBg) {
+        this.setNormalTextSize(unreadTextBg,false);
+    }
+    public void setUnreadTextBg(int unreadTextBg, boolean needJudge) {
+        if (needJudge) {
+            if (this.unreadTextBg == 0) {
+                this.unreadTextBg = unreadTextBg;
+            }
+        } else {
+            this.unreadTextBg = unreadTextBg;
+        }
     }
 
 
+    public int getItemPadTB() {
+        return itemPadTB;
+    }
+    public void setItemPadTB(int itemPadTB) {
+        this.setNormalTextSize(itemPadTB,false);
+    }
+    public void setItemPadTB(int itemPadTB, boolean needJudge) {
+        if (needJudge) {
+            if (this.itemPadTB == 0) {
+                this.itemPadTB = itemPadTB;
+            }
+        } else {
+            this.itemPadTB = itemPadTB;
+        }
+    }
 
-
-
-
+    public int getItemPadLR() {
+        return itemPadLR;
+    }
+    public void setItemPadLR(int itemPadLR) {
+        this.setNormalTextSize(itemPadLR,false);
+    }
+    public void setItemPadLR(int itemPadLR, boolean needJudge) {
+        if (needJudge) {
+            if (this.itemPadLR == 0) {
+                this.itemPadLR = itemPadLR;
+            }
+        } else {
+            this.itemPadLR = itemPadLR;
+        }
+    }
     public ImageView getIvTabIcon() {
         return ivTabIcon;
     }
@@ -193,13 +387,13 @@ public class LqhTabItemView extends FrameLayout {
         //选中的文本颜色
         private int selectedColor;
         //正常文本大小
-        private int normalTextSize = 10; //10sp
+        private int normalTextSize;
         //选择的文本大小
-        private int selectedTextSize = 10; //10sp
+        private int selectedTextSize;
         //文字和图标的距离
-        private int iconMargin;//默认距离2dp
+        private int iconMargin;
         //小红点字体大小
-        private int unReadTextSize=8;//默认8Sp
+        private int unReadTextSize;
         //小红点文字颜色
         private int unreadTextColor;
         //小红点背景颜色
@@ -210,14 +404,6 @@ public class LqhTabItemView extends FrameLayout {
         private int itemPadLR;
         public Builder(Context context){
             this.context = context;
-            normalColor = UIUtils.getColor(context,R.color.default_999999);
-            selectedColor = UIUtils.getColor(context,R.color.selected_ff0000);
-            normalTextSize = UIUtils.sp2px(context,10);
-            selectedTextSize = UIUtils.sp2px(context,10);
-            iconMargin = UIUtils.dip2Px(context,2);
-            unReadTextSize =  UIUtils.sp2px(context,8);
-            unreadTextColor = UIUtils.getColor(context,R.color.white);
-            unreadTextBg = UIUtils.getColor(context,R.color.selected_ff0000);
         }
 
         public Builder setNormalIcon(Drawable normalIcon) {
@@ -285,7 +471,7 @@ public class LqhTabItemView extends FrameLayout {
             return this;
         }
         public LqhTabItemView build(){
-          return   new LqhTabItemView(context).build(this);
+          return new LqhTabItemView(context).build(this);
         }
     }
 
