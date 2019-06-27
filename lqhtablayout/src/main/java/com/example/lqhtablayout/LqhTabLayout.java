@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,7 +28,6 @@ import com.example.lqhtablayout.tabinterface.IPagerChangeListener;
 import com.example.lqhtablayout.utils.DataUtils;
 import com.example.lqhtablayout.utils.UIUtils;
 import com.example.lqhtablayout.widget.LqhLinearLayout;
-import com.example.lqhtablayout.widget.lqhHorizontalScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +39,10 @@ import java.util.List;
  */
 public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, LqhLinearLayout.OnDrawListener {
     private static final String TAG = "LqhTabLayout";
-    //是否为滑动模式
+    //是否为滑动模式，默认不是滑动模式
     private boolean isScrollMode;
-    public static final int MODE_MATCH = 0;   // 直线宽度 == item宽度
-    public static final int MODE_WRAP= 1;    // 直线宽度 == item内容宽度
-    public static final int MODE_EXACTLY = 2;  // 直线宽度 == mIndicatorWidth
-    private int mMode;  // 默认为MODE_MATCH模式
-
-
+    //item是否平分，默认平分
+    private boolean isSpaceEqual;
     //滑动模式下才存在
     private HorizontalScrollView mScrollView;
     //存放内容主布局,用来加TabItemView的
@@ -65,21 +59,20 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private ViewPager mViewPager;
     //监听器
     private ArrayList<LqhTabLayout.BaseOnTabSelectedListener> selectedListeners = new ArrayList<>();
+    //打断器
     OnInterruptListener onInterruptListener;
-
     // 控制动画
     private ValueAnimator mScrollAnimator;
     private float mScrollPivotX = 0.5f; // 滚动中心点 0.0f - 1.0f
-
-
+    //全局配置item
     //正常文本颜色
     private int normalColor;
     //选中的文本颜色
     private int selectedColor;
     //正常文本大小
-    private int normalTextSize = 10; //10sp
+    private int normalTextSize = 15; //15sp
     //选择的文本大小
-    private int selectedTextSize = 10; //10sp
+    private int selectedTextSize = 15; //15sp
     //文字和图标的距离
     private int iconMargin=0;//默认距离dp
     //小红点字体大小
@@ -88,10 +81,12 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private int unreadTextColor;
     //小红点背景颜色
     private int unreadTextBg;
+    //item上下边距
     private int itemPadTB;
+    //item左右边距
     private int itemPadLR;
     /**
-     * 用于绘制显示器
+     * 用于绘制指示器
      */
     private RectF mIndicatorRect = new RectF();
     private Interpolator mStartInterpolator = new LinearInterpolator();
@@ -105,8 +100,18 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private float mIndicatorMarginTop;
     private float mIndicatorMarginRight;
     private float mIndicatorMarginBottom;
+    //是否开启动画
     private boolean mIndicatorAnimEnable;
-    private boolean isSpaceEqual;
+
+    private int animatorPosition;
+    private float animatorpositionOffset;
+
+
+    //指示器模式
+    public static final int MODE_MATCH = 0;   // 直线宽度 == item宽度
+    public static final int MODE_WRAP= 1;    // 直线宽度 == item内容宽度
+    public static final int MODE_EXACTLY = 2;  // 直线宽度 == mIndicatorWidth
+    private int mMode;  // 默认为MODE_MATCH模式
 
     public LqhTabLayout(Context context) {
         this(context, null);
@@ -232,7 +237,6 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         mScrollView = findViewById(R.id.scroll_view);
         linContent = findViewById(R.id.lin_content);
         linContent.setOnDrawListener(this);
-
     }
 
     public void addView(View child) {
@@ -288,13 +292,27 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
 
     private void addTaItemView(View item) {
-        LinearLayout.LayoutParams itemLayoutParams;
-            if (isSpaceEqual) {
-                itemLayoutParams = new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1);
-            } else {
-                itemLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+        linContent.addView(item, getInitLayoutParams(null));
+    }
+    private LinearLayout.LayoutParams getInitLayoutParams(LinearLayout.LayoutParams oldLayoutParams){
+        if (isSpaceEqual) {
+            if(oldLayoutParams==null){
+                oldLayoutParams = new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1);
+            }else{
+                oldLayoutParams.width=0;
+                oldLayoutParams.height=LayoutParams.MATCH_PARENT;
+                oldLayoutParams.height=1;
             }
-        linContent.addView(item, itemLayoutParams);
+        } else {
+            if(oldLayoutParams==null){
+                oldLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+            }else{
+                oldLayoutParams.width=LayoutParams.WRAP_CONTENT;
+                oldLayoutParams.height=LayoutParams.MATCH_PARENT;
+                oldLayoutParams.height=0;
+            }
+        }
+        return oldLayoutParams;
     }
 
     //这三个是自定义的
@@ -302,40 +320,14 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         //这个表示不用画指示器
-        if (mIndicatorHeight < 0||tabs.size()<0||!mIndicatorAnimEnable) {
+        if (tabs.size()<0||!mIndicatorAnimEnable) {
             return;
         }
         calcIndicatorRect(position,positionOffset,positionOffsetPixels);
     }
     private void calcIndicatorRect(int position, float positionOffset, int positionOffsetPixels) {
-        // 计算锚点位置
-        PositionData current = DataUtils.getImitativePositionData(mPositionDataList, position);
-        PositionData next = DataUtils.getImitativePositionData(mPositionDataList, position + 1);
-        float leftX;
-        float nextLeftX;
-        float rightX;
-        float nextRightX;
-        //表示固定指示器长度
-        if (mMode==MODE_EXACTLY) {
-            leftX = current.mLeft + (current.width() - mIndicatorWidth) / 2;
-            nextLeftX = next.mLeft + (next.width() - mIndicatorWidth) / 2;
-            rightX = current.mLeft + (current.width() + mIndicatorWidth) / 2;
-            nextRightX = next.mLeft + (next.width() + mIndicatorWidth) / 2;
-        } else if(mMode==MODE_MATCH){
-            leftX = current.mLeft + mIndicatorMarginLeft;
-            nextLeftX = next.mLeft + mIndicatorMarginLeft;
-            rightX = current.mRight - mIndicatorMarginRight;
-            nextRightX = next.mRight - mIndicatorMarginRight;
-        }else{
-            leftX = current.mContentLeft + mIndicatorMarginLeft;
-            nextLeftX = next.mContentLeft + mIndicatorMarginLeft;
-            rightX = current.mContentRight - mIndicatorMarginRight;
-            nextRightX = next.mContentRight - mIndicatorMarginRight;
-        }
-        mIndicatorRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
-        mIndicatorRect.right = rightX + (nextRightX - rightX) * mEndInterpolator.getInterpolation(positionOffset);
-        mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginTop;
-        mIndicatorRect.bottom = getHeight() - mIndicatorMarginBottom;
+        this.animatorPosition=position;
+        this.animatorpositionOffset=positionOffset;
         linContent.invalidate();
          //手指跟随滚动
         if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
@@ -449,6 +441,34 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             return;
         }
         if (mIndicatorHeight > 0) {
+            // 计算锚点位置
+            PositionData current = DataUtils.getImitativePositionData(mPositionDataList, animatorPosition);
+            PositionData next = DataUtils.getImitativePositionData(mPositionDataList, animatorPosition + 1);
+            float leftX;
+            float nextLeftX;
+            float rightX;
+            float nextRightX;
+            //表示固定指示器长度
+            if (mMode==MODE_EXACTLY) {
+                leftX = current.mLeft + (current.width() - mIndicatorWidth) / 2;
+                nextLeftX = next.mLeft + (next.width() - mIndicatorWidth) / 2;
+                rightX = current.mLeft + (current.width() + mIndicatorWidth) / 2;
+                nextRightX = next.mLeft + (next.width() + mIndicatorWidth) / 2;
+            } else if(mMode==MODE_MATCH){
+                leftX = current.mLeft + mIndicatorMarginLeft;
+                nextLeftX = next.mLeft + mIndicatorMarginLeft;
+                rightX = current.mRight - mIndicatorMarginRight;
+                nextRightX = next.mRight - mIndicatorMarginRight;
+            }else{
+                leftX = current.mContentLeft + mIndicatorMarginLeft;
+                nextLeftX = next.mContentLeft + mIndicatorMarginLeft;
+                rightX = current.mContentRight - mIndicatorMarginRight;
+                nextRightX = next.mContentRight - mIndicatorMarginRight;
+            }
+            mIndicatorRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(animatorpositionOffset);
+            mIndicatorRect.right = rightX + (nextRightX - rightX) * mEndInterpolator.getInterpolation(animatorpositionOffset);
+            mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginTop;
+            mIndicatorRect.bottom = getHeight() - mIndicatorMarginBottom;
             //大于零要画下标
             canvas.drawRoundRect(mIndicatorRect,mIndicatorCornerRadius,mIndicatorCornerRadius, mPaint);
         }
@@ -677,5 +697,214 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         Log.e(TAG, "onSizeChanged");
+    }
+    private void UpdateTabItemViewStyle(){
+
+    }
+
+
+    public boolean isScrollMode() {
+        return isScrollMode;
+    }
+
+//    public void setScrollMode(boolean scrollMode) {
+//        isScrollMode = scrollMode;
+//        initInnerContentView();
+//    }
+
+    public boolean isSpaceEqual() {
+        return isSpaceEqual;
+    }
+
+    public void setSpaceEqual(boolean spaceEqual) {
+        isSpaceEqual = spaceEqual;
+    }
+
+    public int getNormalColor() {
+        return normalColor;
+    }
+
+    public void setNormalColor(int normalColor) {
+        this.normalColor = normalColor;
+    }
+
+    public int getSelectedColor() {
+        return selectedColor;
+    }
+
+    public void setSelectedColor(int selectedColor) {
+        this.selectedColor = selectedColor;
+    }
+
+    public int getNormalTextSize() {
+        return normalTextSize;
+    }
+
+    public void setNormalTextSize(int normalTextSize) {
+        this.normalTextSize = normalTextSize;
+    }
+
+    public int getSelectedTextSize() {
+        return selectedTextSize;
+    }
+
+    public void setSelectedTextSize(int selectedTextSize) {
+        this.selectedTextSize = selectedTextSize;
+    }
+
+    public int getIconMargin() {
+        return iconMargin;
+    }
+
+    public void setIconMargin(int iconMargin) {
+        this.iconMargin = iconMargin;
+    }
+
+    public int getUnReadTextSize() {
+        return unReadTextSize;
+    }
+
+    public void setUnReadTextSize(int unReadTextSize) {
+        this.unReadTextSize = unReadTextSize;
+    }
+
+    public int getUnreadTextColor() {
+        return unreadTextColor;
+    }
+
+    public void setUnreadTextColor(int unreadTextColor) {
+        this.unreadTextColor = unreadTextColor;
+    }
+
+    public int getUnreadTextBg() {
+        return unreadTextBg;
+    }
+
+    public void setUnreadTextBg(int unreadTextBg) {
+        this.unreadTextBg = unreadTextBg;
+    }
+
+    public int getItemPadTB() {
+        return itemPadTB;
+    }
+
+    public void setItemPadTB(int itemPadTB) {
+        this.itemPadTB = itemPadTB;
+    }
+
+    public int getItemPadLR() {
+        return itemPadLR;
+    }
+
+    public void setItemPadLR(int itemPadLR) {
+        this.itemPadLR = itemPadLR;
+    }
+    //==========================
+    public Interpolator getmStartInterpolator() {
+        return mStartInterpolator;
+    }
+
+    public void setmStartInterpolator(Interpolator mStartInterpolator) {
+        this.mStartInterpolator = mStartInterpolator;
+        linContent.invalidate();
+    }
+
+    public Interpolator getmEndInterpolator() {
+        return mEndInterpolator;
+    }
+
+    public void setmEndInterpolator(Interpolator mEndInterpolator) {
+        this.mEndInterpolator = mEndInterpolator;
+        linContent.invalidate();
+    }
+
+    public int getmIndicatorWidth() {
+        return mIndicatorWidth;
+    }
+
+    public void setmIndicatorWidth(int mIndicatorWidth) {
+        this.mIndicatorWidth = mIndicatorWidth;
+        linContent.invalidate();
+    }
+
+    public int getmIndicatorHeight() {
+        return mIndicatorHeight;
+    }
+
+    public void setmIndicatorHeight(int mIndicatorHeight) {
+        this.mIndicatorHeight = mIndicatorHeight;
+        linContent.invalidate();
+    }
+
+    public float getmIndicatorCornerRadius() {
+        return mIndicatorCornerRadius;
+    }
+
+    public void setmIndicatorCornerRadius(float mIndicatorCornerRadius) {
+        this.mIndicatorCornerRadius = mIndicatorCornerRadius;
+        linContent.invalidate();
+    }
+
+    public int getmIndicatorColor() {
+        return mIndicatorColor;
+    }
+
+    public void setmIndicatorColor(int mIndicatorColor) {
+        this.mIndicatorColor = mIndicatorColor;
+        mPaint.setColor(this.mIndicatorColor);
+        linContent.invalidate();
+    }
+
+    public float getmIndicatorMarginLeft() {
+        return mIndicatorMarginLeft;
+    }
+
+    public void setmIndicatorMarginLeft(float mIndicatorMarginLeft) {
+        this.mIndicatorMarginLeft = mIndicatorMarginLeft;
+        linContent.invalidate();
+    }
+
+    public float getmIndicatorMarginTop() {
+        return mIndicatorMarginTop;
+    }
+
+    public void setmIndicatorMarginTop(float mIndicatorMarginTop) {
+        this.mIndicatorMarginTop = mIndicatorMarginTop;
+        linContent.invalidate();
+    }
+
+    public float getmIndicatorMarginRight() {
+        return mIndicatorMarginRight;
+    }
+
+    public void setmIndicatorMarginRight(float mIndicatorMarginRight) {
+        this.mIndicatorMarginRight = mIndicatorMarginRight;
+        linContent.invalidate();
+    }
+
+    public float getmIndicatorMarginBottom() {
+        return mIndicatorMarginBottom;
+    }
+
+    public void setmIndicatorMarginBottom(float mIndicatorMarginBottom) {
+        this.mIndicatorMarginBottom = mIndicatorMarginBottom;
+        linContent.invalidate();
+    }
+
+    public boolean ismIndicatorAnimEnable() {
+        return mIndicatorAnimEnable;
+    }
+
+    public void setmIndicatorAnimEnable(boolean mIndicatorAnimEnable) {
+        this.mIndicatorAnimEnable = mIndicatorAnimEnable;
+    }
+
+    public int getmMode() {
+        return mMode;
+    }
+
+    public void setmMode(int mMode) {
+        this.mMode = mMode;
+        linContent.invalidate();
     }
 }
