@@ -231,16 +231,11 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, l
 
     private void addTaItemView(View item) {
         LinearLayout.LayoutParams itemLayoutParams;
-        if (isScrollMode) {
-            itemLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-        } else {
             if (isSpaceEqual) {
                 itemLayoutParams = new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1);
             } else {
                 itemLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
             }
-
-        }
         linContent.addView(item, itemLayoutParams);
     }
 
