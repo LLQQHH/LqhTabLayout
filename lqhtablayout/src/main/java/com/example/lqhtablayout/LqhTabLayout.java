@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -47,7 +49,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     //滑动模式下才存在
     private HorizontalScrollView mScrollView;
     //存放内容主布局,用来加TabItemView的
-    private LqhLinearLayout linContent;
+    private LqhLinearLayout mLinContent;
     //tab的个数
     private final ArrayList<Tab> tabs = new ArrayList<>();
     //item的位置信息
@@ -237,8 +239,8 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         }
         //不滑动没有这个View
         mScrollView = findViewById(R.id.scroll_view);
-        linContent = findViewById(R.id.lin_content);
-        linContent.setOnDrawListener(this);
+        mLinContent = findViewById(R.id.lin_content);
+        mLinContent.setOnDrawListener(this);
     }
 
     public void addView(View child) {
@@ -259,7 +261,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private void addViewInternal(View child) {
         if (child instanceof LqhTabItemView) {
             this.addTab(new Tab((LqhTabItemView) child));
-        } else if (linContent == null) {
+        } else if (mLinContent == null) {
             super.addView(child, -1, generateDefaultLayoutParams());
         } else {
             throw new IllegalArgumentException("Only LqhTabItemView instances can be added to LqhTabLayout");
@@ -296,7 +298,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
 
     private void addTaItemView(View item) {
-        linContent.addView(item, getInitLayoutParams(null));
+        mLinContent.addView(item, getInitLayoutParams(null));
     }
 
     private LinearLayout.LayoutParams getInitLayoutParams(LinearLayout.LayoutParams oldLayoutParams) {
@@ -334,7 +336,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private void calcIndicatorRect(int position, float positionOffset, int positionOffsetPixels) {
         this.animatorPosition = position;
         this.animatorpositionOffset = positionOffset;
-        linContent.invalidate();
+        mLinContent.invalidate();
         //手指跟随滚动
         if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
             int currentPosition = Math.min(mPositionDataList.size() - 1, position);
@@ -677,7 +679,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void addTabItemDataList(List<TabItemData> datas) {
         tabs.clear();
-        linContent.removeAllViews();
+        mLinContent.removeAllViews();
         for (TabItemData data : datas) {
             LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this.getContext());
             LqhTabItemView lqhTabItemView = builder.setSelectedIcon(data.getSelectedIcon())
@@ -712,7 +714,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     private void UpdateTabItemViewStyle() {
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 if (tabs.get(i).getLqhTabItemView() != null) {
                     tabs.get(i).getLqhTabItemView().updateStyle(i == mCurrentTabPosition);
@@ -743,7 +745,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setSpaceEqual(boolean spaceEqual) {
         isSpaceEqual = spaceEqual;
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -761,7 +763,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setNormalColor(int normalColor) {
         this.normalColor = normalColor;
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -778,7 +780,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setSelectedColor(int selectedColor) {
         this.selectedColor = selectedColor;
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -795,7 +797,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setNormalTextSize(int normalTextSize) {
         this.normalTextSize = UIUtils.sp2px(context, normalTextSize);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -812,7 +814,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setSelectedTextSize(int selectedTextSize) {
         this.selectedTextSize = UIUtils.sp2px(context, selectedTextSize);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -829,7 +831,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setIconMargin(int iconMargin) {
         this.iconMargin = UIUtils.dp2px(context, iconMargin);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -846,7 +848,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setUnReadTextSize(int unReadTextSize) {
         this.unReadTextSize = UIUtils.sp2px(context, unReadTextSize);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -863,7 +865,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setUnreadTextColor(int unreadTextColor) {
         this.unreadTextColor = unreadTextColor;
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -880,7 +882,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setUnreadTextBg(int unreadTextBg) {
         this.unreadTextBg = unreadTextBg;
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -897,7 +899,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setItemPadTB(int itemPadTB) {
         this.itemPadTB = UIUtils.dp2px(context, itemPadTB);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -914,7 +916,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setItemPadLR(int itemPadLR) {
         this.itemPadLR = UIUtils.dp2px(context, itemPadLR);
-        for (int i = 0; i < linContent.getChildCount(); i++) {
+        for (int i = 0; i < mLinContent.getChildCount(); i++) {
             if (i < tabs.size()) {
                 LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
                 if (lqhTabItemView != null) {
@@ -932,7 +934,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmStartInterpolator(Interpolator mStartInterpolator) {
         this.mStartInterpolator = mStartInterpolator;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public Interpolator getmEndInterpolator() {
@@ -941,7 +943,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmEndInterpolator(Interpolator mEndInterpolator) {
         this.mEndInterpolator = mEndInterpolator;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public int getmIndicatorWidth() {
@@ -950,7 +952,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorWidth(int mIndicatorWidth) {
         this.mIndicatorWidth = mIndicatorWidth;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public int getmIndicatorHeight() {
@@ -959,7 +961,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorHeight(int mIndicatorHeight) {
         this.mIndicatorHeight = mIndicatorHeight;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public float getmIndicatorCornerRadius() {
@@ -968,7 +970,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorCornerRadius(float mIndicatorCornerRadius) {
         this.mIndicatorCornerRadius = mIndicatorCornerRadius;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public int getmIndicatorColor() {
@@ -978,7 +980,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     public void setmIndicatorColor(int mIndicatorColor) {
         this.mIndicatorColor = mIndicatorColor;
         mPaint.setColor(this.mIndicatorColor);
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public float getmIndicatorMarginLeft() {
@@ -987,7 +989,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorMarginLeft(float mIndicatorMarginLeft) {
         this.mIndicatorMarginLeft = mIndicatorMarginLeft;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public float getmIndicatorMarginTop() {
@@ -996,7 +998,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorMarginTop(float mIndicatorMarginTop) {
         this.mIndicatorMarginTop = mIndicatorMarginTop;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public float getmIndicatorMarginRight() {
@@ -1005,7 +1007,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorMarginRight(float mIndicatorMarginRight) {
         this.mIndicatorMarginRight = mIndicatorMarginRight;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public float getmIndicatorMarginBottom() {
@@ -1014,7 +1016,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmIndicatorMarginBottom(float mIndicatorMarginBottom) {
         this.mIndicatorMarginBottom = mIndicatorMarginBottom;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
 
     public boolean ismIndicatorAnimEnable() {
@@ -1031,6 +1033,28 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setmMode(int mMode) {
         this.mMode = mMode;
-        linContent.invalidate();
+        mLinContent.invalidate();
     }
+//    @Override
+//    protected Parcelable onSaveInstanceState() {
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelable("instanceState", super.onSaveInstanceState());
+//        bundle.putInt("mCurrentTab", mCurrentTabPosition);
+//        bundle.putInt("mLastTab", mLstTabPosition);
+//        return bundle;
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Parcelable state) {
+//        if (state instanceof Bundle) {
+//            Bundle bundle = (Bundle) state;
+//            mCurrentTabPosition = bundle.getInt("mCurrentTab");
+//            mLstTabPosition= bundle.getInt("mLastTab");
+//            state = bundle.getParcelable("instanceState");
+//            if (mCurrentTabPosition != 0 && mLinContent.getChildCount() > 0) {
+//                judgeSelected(mLstTabPosition,mCurrentTabPosition);
+//            }
+//        }
+//        super.onRestoreInstanceState(state);
+//    }
 }
