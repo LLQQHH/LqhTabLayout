@@ -137,7 +137,7 @@ public class LqhTabItemView extends FrameLayout {
         UIUtils.setUnReadLocation(tvTabUnread,dpRXOffset,dpTYOffset);
     }
     public void setUnReadNum(int num,int dpRXOffset,int dpTYOffset){
-        tvTabUnread.setVisibility(View.VISIBLE);
+            tvTabUnread.setVisibility(View.VISIBLE);
            UIUtils.show(tvTabUnread,num,unreadTextBg,8,0, Color.parseColor("#ffffff"));
            UIUtils.setUnReadLocation(tvTabUnread,dpRXOffset,dpTYOffset);
 
@@ -148,25 +148,14 @@ public class LqhTabItemView extends FrameLayout {
 
 
 
-    public void updateStyle(){
+    public void updateStyle(boolean isSelected){
         llTabContent.setPadding(itemPadLR,itemPadTB,itemPadLR,itemPadTB);
         if(!TextUtils.isEmpty(itemText)){
             tvTabTitle.setText(itemText);
         }
-        if(normalColor!=0){
-            tvTabTitle.setTextColor(normalColor);
-        }
-        if(normalTextSize!=0){
-            tvTabTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,normalTextSize);
-        }
+        refreshTabUI(isSelected);
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) tvTabTitle.getLayoutParams();
         layoutParams.topMargin=iconMargin;
-        if(normalIcon!=null){
-            ivTabIcon.setVisibility(View.VISIBLE);
-            ivTabIcon.setImageDrawable(normalIcon);
-        }else{
-            ivTabIcon.setVisibility(View.GONE);
-        }
         if(unReadTextSize!=0){
             tvTabUnread.setTextSize(TypedValue.COMPLEX_UNIT_PX,unReadTextSize);
         }
@@ -245,12 +234,15 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(normalTextSize,false);
     }
     public void setNormalTextSize(int normalTextSize, boolean needJudge) {
+        setNormalTextSize(normalTextSize,needJudge,false);
+    }
+    public void setNormalTextSize(int normalTextSize, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.normalTextSize == 0) {
-                this.normalTextSize = normalTextSize;
+                this.normalTextSize=isPxSize?normalTextSize:UIUtils.sp2px(context,normalTextSize);
             }
         } else {
-            this.normalTextSize = normalTextSize;
+            this.normalTextSize=isPxSize?normalTextSize:UIUtils.sp2px(context,normalTextSize);
         }
     }
     public int getSelectedTextSize() {
@@ -260,14 +252,18 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(selectedTextSize,false);
     }
     public void setSelectedTextSize(int selectedTextSize, boolean needJudge) {
+        setSelectedTextSize(selectedTextSize,needJudge,false);
+    }
+    public void setSelectedTextSize(int selectedTextSize, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.selectedTextSize == 0) {
-                this.selectedTextSize = selectedTextSize;
+                this.selectedTextSize=isPxSize?selectedTextSize:UIUtils.sp2px(context,selectedTextSize);
             }
         } else {
-            this.selectedTextSize = selectedTextSize;
+            this.selectedTextSize=isPxSize?selectedTextSize:UIUtils.sp2px(context,selectedTextSize);
         }
     }
+
 
     public int getIconMargin() {
         return iconMargin;
@@ -276,14 +272,18 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(iconMargin,false);
     }
     public void setIconMargin(int iconMargin, boolean needJudge) {
+        setIconMargin(iconMargin,needJudge,false);
+    }
+    public void setIconMargin(int iconMargin, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.iconMargin == 0) {
-                this.iconMargin = iconMargin;
+                this.iconMargin=isPxSize?iconMargin:UIUtils.dp2px(context,iconMargin);
             }
         } else {
-            this.iconMargin = iconMargin;
+            this.iconMargin=isPxSize?iconMargin:UIUtils.dp2px(context,iconMargin);
         }
     }
+
     public int getUnReadTextSize() {
         return unReadTextSize;
     }
@@ -291,14 +291,18 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(unReadTextSize,false);
     }
     public void setUnReadTextSize(int unReadTextSize, boolean needJudge) {
+        setUnReadTextSize(unReadTextSize,needJudge,false);
+    }
+    public void setUnReadTextSize(int unReadTextSize, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.unReadTextSize == 0) {
-                this.unReadTextSize = unReadTextSize;
+                this.unReadTextSize=isPxSize?unReadTextSize:UIUtils.sp2px(context,unReadTextSize);
             }
         } else {
-            this.unReadTextSize = unReadTextSize;
+            this.unReadTextSize=isPxSize?unReadTextSize:UIUtils.sp2px(context,unReadTextSize);
         }
     }
+
     public int getUnreadTextColor() {
         return unreadTextColor;
     }
@@ -338,14 +342,18 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(itemPadTB,false);
     }
     public void setItemPadTB(int itemPadTB, boolean needJudge) {
+        setItemPadTB(itemPadTB,needJudge,false);
+    }
+    public void setItemPadTB(int itemPadTB, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.itemPadTB == 0) {
-                this.itemPadTB = itemPadTB;
+                this.itemPadTB=isPxSize?itemPadTB:UIUtils.dp2px(context,itemPadTB);
             }
         } else {
-            this.itemPadTB = itemPadTB;
+            this.itemPadTB=isPxSize?itemPadTB:UIUtils.dp2px(context,itemPadTB);
         }
     }
+
 
     public int getItemPadLR() {
         return itemPadLR;
@@ -354,12 +362,15 @@ public class LqhTabItemView extends FrameLayout {
         this.setNormalTextSize(itemPadLR,false);
     }
     public void setItemPadLR(int itemPadLR, boolean needJudge) {
+        setItemPadLR(itemPadLR,needJudge,false);
+    }
+    public void setItemPadLR(int itemPadLR, boolean needJudge,boolean isPxSize) {
         if (needJudge) {
             if (this.itemPadLR == 0) {
-                this.itemPadLR = itemPadLR;
+                this.itemPadLR=isPxSize?itemPadLR:UIUtils.dp2px(context,itemPadLR);
             }
         } else {
-            this.itemPadLR = itemPadLR;
+            this.itemPadLR=isPxSize?itemPadLR:UIUtils.dp2px(context,itemPadLR);
         }
     }
     public ImageView getIvTabIcon() {
@@ -436,22 +447,22 @@ public class LqhTabItemView extends FrameLayout {
         }
 
         public Builder setNormalTextSize(int normalTextSize) {
-            this.normalTextSize = normalTextSize;
+            this.normalTextSize = UIUtils.sp2px(context,normalTextSize);
             return this;
         }
 
         public Builder setSelectedTextSize(int selectedTextSize) {
-            this.selectedTextSize = selectedTextSize;
+            this.selectedTextSize = UIUtils.sp2px(context,selectedTextSize);
             return this;
         }
 
         public Builder setIconMargin(int iconMargin) {
-            this.iconMargin = iconMargin;
+            this.iconMargin = UIUtils.dp2px(context,iconMargin);
             return this;
         }
 
         public Builder setUnReadTextSize(int unReadTextSize) {
-            this.unReadTextSize = unReadTextSize;
+            this.unReadTextSize = UIUtils.sp2px(context,unReadTextSize);
             return this;
         }
 
@@ -466,12 +477,12 @@ public class LqhTabItemView extends FrameLayout {
         }
 
         public Builder setItemPadTB(int itemPadTB) {
-            this.itemPadTB = itemPadTB;
+            this.itemPadTB = UIUtils.dp2px(context,itemPadTB);
             return this;
         }
 
         public Builder setItemPadLR(int itemPadLR) {
-            this.itemPadLR = itemPadLR;
+            this.itemPadLR = UIUtils.dp2px(context,itemPadLR);
             return this;
         }
         public LqhTabItemView build(){

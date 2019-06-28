@@ -18,16 +18,16 @@ import java.util.regex.Pattern;
  */
 public class UIUtils {
     /**
-     * dip-->px
+     * dp-->px
      */
-    public static int dip2Px(Context context, int dip) {
+    public static int dp2px(Context context, int dip) {
         float density = context.getResources().getDisplayMetrics().density;
         int px = (int) (dip * density + 0.5f);
         return px;
     }
 
     /**
-     * 将sp值转换为px值，保证文字大小不变
+     * sp-->px
      *
      * @param spValue
      * @return
@@ -36,6 +36,12 @@ public class UIUtils {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
+
+    public static int px2dp(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue / fontScale + 0.5f);
+    }
+
 
     public static int getColor(Context context, int colorId){
         return ContextCompat.getColor(context,colorId);
@@ -139,8 +145,8 @@ public class UIUtils {
     public static void setUnReadLocation(TextView UnReadView, int dpRXOffset, int dpTYOffset){
 
         RelativeLayout.LayoutParams rll = (RelativeLayout.LayoutParams) UnReadView.getLayoutParams();
-        rll.rightMargin=UIUtils.dip2Px(UnReadView.getContext(),dpRXOffset);
-        rll.topMargin=UIUtils.dip2Px(UnReadView.getContext(),dpTYOffset);
+        rll.rightMargin=UIUtils.dp2px(UnReadView.getContext(),dpRXOffset);
+        rll.topMargin=UIUtils.dp2px(UnReadView.getContext(),dpTYOffset);
         UnReadView.setLayoutParams(rll);
     }
 }

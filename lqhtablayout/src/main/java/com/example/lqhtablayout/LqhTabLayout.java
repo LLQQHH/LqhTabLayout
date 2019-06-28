@@ -39,6 +39,7 @@ import java.util.List;
  */
 public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, LqhLinearLayout.OnDrawListener {
     private static final String TAG = "LqhTabLayout";
+    private Context context;
     //是否为滑动模式，默认不是滑动模式
     private boolean isScrollMode;
     //item是否平分，默认平分
@@ -74,9 +75,9 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     //选择的文本大小
     private int selectedTextSize = 15; //15sp
     //文字和图标的距离
-    private int iconMargin=0;//默认距离dp
+    private int iconMargin = 0;//默认距离dp
     //小红点字体大小
-    private int unReadTextSize=8;//默认8Sp
+    private int unReadTextSize = 8;//默认8Sp
     //小红点文字颜色
     private int unreadTextColor;
     //小红点背景颜色
@@ -91,11 +92,11 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private RectF mIndicatorRect = new RectF();
     private Interpolator mStartInterpolator = new LinearInterpolator();
     private Interpolator mEndInterpolator = new LinearInterpolator();
-    private Paint mPaint=new Paint();
+    private Paint mPaint = new Paint();
     private int mIndicatorWidth;
     private int mIndicatorHeight;
     private float mIndicatorCornerRadius;
-    private int mIndicatorColor=Color.parseColor("#ffffff");
+    private int mIndicatorColor = Color.parseColor("#ffffff");
     private float mIndicatorMarginLeft;
     private float mIndicatorMarginTop;
     private float mIndicatorMarginRight;
@@ -109,7 +110,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     //指示器模式
     public static final int MODE_MATCH = 0;   // 直线宽度 == item宽度
-    public static final int MODE_WRAP= 1;    // 直线宽度 == item内容宽度
+    public static final int MODE_WRAP = 1;    // 直线宽度 == item内容宽度
     public static final int MODE_EXACTLY = 2;  // 直线宽度 == mIndicatorWidth
     private int mMode;  // 默认为MODE_MATCH模式
 
@@ -123,6 +124,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public LqhTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context = context;
         setWillNotDraw(false);//viewgroup默认不调用onDraw方法,需要调用这个方法来清除flag，会调用
         initAttrs(context, attrs);
     }
@@ -133,24 +135,24 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             isScrollMode = ta.getBoolean(R.styleable.LqhTabLayout_lqh_scroll_mode, false);
             isSpaceEqual = ta.getBoolean(R.styleable.LqhTabLayout_lqh_space_equal, true);
             //全局item设置
-            normalColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemNormalTextColor, UIUtils.getColor(context,R.color.default_999999));
-            selectedColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemSelectedColor,UIUtils.getColor(context,R.color.selected_ff0000));
+            normalColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemNormalTextColor, UIUtils.getColor(context, R.color.default_999999));
+            selectedColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemSelectedColor, UIUtils.getColor(context, R.color.selected_ff0000));
             normalTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemNormalTextSize, UIUtils.sp2px(context, normalTextSize));
             selectedTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemSelectedTextSize, UIUtils.sp2px(context, selectedTextSize));
-            iconMargin = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemIconMargin, UIUtils.dip2Px(context, iconMargin));
+            iconMargin = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemIconMargin, UIUtils.dp2px(context, iconMargin));
             unReadTextSize = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemUnreadTextSize, UIUtils.sp2px(context, unReadTextSize));
             unreadTextColor = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextColor, UIUtils.getColor(context, R.color.white));
-            unreadTextBg = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextBg,UIUtils.getColor(context,R.color.selected_ff0000));
-            itemPadTB = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemContentPadTB,0);
-            itemPadLR = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemPadContentLR,0);
+            unreadTextBg = ta.getColor(R.styleable.LqhTabLayout_lqh_itemUnreadTextBg, UIUtils.getColor(context, R.color.selected_ff0000));
+            itemPadTB = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemContentPadTB, 0);
+            itemPadLR = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_itemPadContentLR, 0);
             //下标样式
             mMode = ta.getInteger(R.styleable.LqhTabLayout_lqh_indicator_model, 0);
             //下标宽度
-            mIndicatorWidth = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_width, UIUtils.dip2Px(context,5));
+            mIndicatorWidth = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_width, UIUtils.dp2px(context, 5));
             //下标高度大于0才显示指示器
-            mIndicatorHeight = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_height, -1);
+            mIndicatorHeight = ta.getDimensionPixelSize(R.styleable.LqhTabLayout_lqh_indicator_height, 0);
             //下标圆角
-            mIndicatorCornerRadius = ta.getDimension(R.styleable.LqhTabLayout_lqh_indicator_corner_radius, -1);
+            mIndicatorCornerRadius = ta.getDimension(R.styleable.LqhTabLayout_lqh_indicator_corner_radius, 0);
             //下标颜色,默认白色
             mIndicatorColor = ta.getColor(R.styleable.LqhTabLayout_lqh_indicator_color, mIndicatorColor);
             mIndicatorAnimEnable = ta.getBoolean(R.styleable.LqhTabLayout_lqh_indicator_anim_enable, true);
@@ -271,22 +273,24 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         tabs.add(tab);
         configTabItemView(tab);
         addTaItemView(tab.getCustomView() == null ? tab.getLqhTabItemView() : tab.getCustomView());
+        initialise();
     }
+
     //配置全局TabItemView属性
     private void configTabItemView(Tab tab) {
-        if(tab.getLqhTabItemView()!=null){
+        if (tab.getLqhTabItemView() != null) {
             LqhTabItemView lqhTabItemView = tab.getLqhTabItemView();
-            lqhTabItemView.setNormalColor(normalColor,true);
-            lqhTabItemView.setSelectedColor(selectedColor,true);
-            lqhTabItemView.setNormalTextSize(normalTextSize,true);
-            lqhTabItemView.setSelectedTextSize(selectedTextSize,true);
-            lqhTabItemView.setIconMargin(iconMargin,true);
-            lqhTabItemView.setUnReadTextSize(unReadTextSize,true);
-            lqhTabItemView.setUnreadTextColor(unreadTextColor,true);
-            lqhTabItemView.setUnreadTextBg(unreadTextBg,true);
-            lqhTabItemView.setItemPadTB(itemPadTB,true);
-            lqhTabItemView.setItemPadLR(itemPadLR,true);
-            lqhTabItemView.updateStyle();
+            lqhTabItemView.setNormalColor(normalColor, true);
+            lqhTabItemView.setSelectedColor(selectedColor, true);
+            lqhTabItemView.setNormalTextSize(normalTextSize, true, true);
+            lqhTabItemView.setSelectedTextSize(selectedTextSize, true, true);
+            lqhTabItemView.setIconMargin(iconMargin, true, true);
+            lqhTabItemView.setUnReadTextSize(unReadTextSize, true, true);
+            lqhTabItemView.setUnreadTextColor(unreadTextColor, true);
+            lqhTabItemView.setUnreadTextBg(unreadTextBg, true);
+            lqhTabItemView.setItemPadTB(itemPadTB, true, true);
+            lqhTabItemView.setItemPadLR(itemPadLR, true, true);
+            lqhTabItemView.updateStyle(tabs.indexOf(tab) == mCurrentTabPosition);
         }
     }
 
@@ -294,22 +298,23 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     private void addTaItemView(View item) {
         linContent.addView(item, getInitLayoutParams(null));
     }
-    private LinearLayout.LayoutParams getInitLayoutParams(LinearLayout.LayoutParams oldLayoutParams){
+
+    private LinearLayout.LayoutParams getInitLayoutParams(LinearLayout.LayoutParams oldLayoutParams) {
         if (isSpaceEqual) {
-            if(oldLayoutParams==null){
+            if (oldLayoutParams == null) {
                 oldLayoutParams = new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1);
-            }else{
-                oldLayoutParams.width=0;
-                oldLayoutParams.height=LayoutParams.MATCH_PARENT;
-                oldLayoutParams.height=1;
+            } else {
+                oldLayoutParams.width = 0;
+                oldLayoutParams.height = LayoutParams.MATCH_PARENT;
+                oldLayoutParams.height = 1;
             }
         } else {
-            if(oldLayoutParams==null){
+            if (oldLayoutParams == null) {
                 oldLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-            }else{
-                oldLayoutParams.width=LayoutParams.WRAP_CONTENT;
-                oldLayoutParams.height=LayoutParams.MATCH_PARENT;
-                oldLayoutParams.height=0;
+            } else {
+                oldLayoutParams.width = LayoutParams.WRAP_CONTENT;
+                oldLayoutParams.height = LayoutParams.MATCH_PARENT;
+                oldLayoutParams.height = 0;
             }
         }
         return oldLayoutParams;
@@ -320,24 +325,25 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         //这个表示不用画指示器
-        if (tabs.size()<0||!mIndicatorAnimEnable) {
+        if (tabs.size() < 0 || !mIndicatorAnimEnable) {
             return;
         }
-        calcIndicatorRect(position,positionOffset,positionOffsetPixels);
+        calcIndicatorRect(position, positionOffset, positionOffsetPixels);
     }
+
     private void calcIndicatorRect(int position, float positionOffset, int positionOffsetPixels) {
-        this.animatorPosition=position;
-        this.animatorpositionOffset=positionOffset;
+        this.animatorPosition = position;
+        this.animatorpositionOffset = positionOffset;
         linContent.invalidate();
-         //手指跟随滚动
+        //手指跟随滚动
         if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
-                int currentPosition = Math.min(mPositionDataList.size() - 1, position);
-                int nextPosition = Math.min(mPositionDataList.size() - 1, position + 1);
-                PositionData currentScroll = mPositionDataList.get(currentPosition);
-                PositionData nextScroll = mPositionDataList.get(nextPosition);
-                float scrollTo = currentScroll.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
-                float nextScrollTo = nextScroll.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
-                mScrollView.scrollTo((int) (scrollTo + (nextScrollTo - scrollTo) * positionOffset), 0);
+            int currentPosition = Math.min(mPositionDataList.size() - 1, position);
+            int nextPosition = Math.min(mPositionDataList.size() - 1, position + 1);
+            PositionData currentScroll = mPositionDataList.get(currentPosition);
+            PositionData nextScroll = mPositionDataList.get(nextPosition);
+            float scrollTo = currentScroll.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
+            float nextScrollTo = nextScroll.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
+            mScrollView.scrollTo((int) (scrollTo + (nextScrollTo - scrollTo) * positionOffset), 0);
         }
     }
 
@@ -346,8 +352,8 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     public void onPageSelected(int position) {
         changeSelected(LqhTabLayout.this.mCurrentTabPosition, position);
         //不需要动画的话，就在这里改变下标
-        if(!mIndicatorAnimEnable){
-            calcIndicatorRect(position,0,0);
+        if (!mIndicatorAnimEnable) {
+            calcIndicatorRect(position, 0, 0);
         }
     }
 
@@ -355,6 +361,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     public void onPageScrollStateChanged(int state) {
 
     }
+
     //提供数据给指示器
     @Override
     public void onPositionDataProvide(List<PositionData> dataList) {
@@ -432,6 +439,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             tabs.get(position).getLqhTabItemView().hideUnread();
         }
     }
+
     //这是Scroll模式才有的
     @Override
     public void onDrawIndicator(Canvas canvas) {
@@ -449,17 +457,17 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             float rightX;
             float nextRightX;
             //表示固定指示器长度
-            if (mMode==MODE_EXACTLY) {
+            if (mMode == MODE_EXACTLY) {
                 leftX = current.mLeft + (current.width() - mIndicatorWidth) / 2;
                 nextLeftX = next.mLeft + (next.width() - mIndicatorWidth) / 2;
                 rightX = current.mLeft + (current.width() + mIndicatorWidth) / 2;
                 nextRightX = next.mLeft + (next.width() + mIndicatorWidth) / 2;
-            } else if(mMode==MODE_MATCH){
+            } else if (mMode == MODE_MATCH) {
                 leftX = current.mLeft + mIndicatorMarginLeft;
                 nextLeftX = next.mLeft + mIndicatorMarginLeft;
                 rightX = current.mRight - mIndicatorMarginRight;
                 nextRightX = next.mRight - mIndicatorMarginRight;
-            }else{
+            } else {
                 leftX = current.mContentLeft + mIndicatorMarginLeft;
                 nextLeftX = next.mContentLeft + mIndicatorMarginLeft;
                 rightX = current.mContentRight - mIndicatorMarginRight;
@@ -470,9 +478,10 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             mIndicatorRect.top = getHeight() - mIndicatorHeight - mIndicatorMarginTop;
             mIndicatorRect.bottom = getHeight() - mIndicatorMarginBottom;
             //大于零要画下标
-            canvas.drawRoundRect(mIndicatorRect,mIndicatorCornerRadius,mIndicatorCornerRadius, mPaint);
+            canvas.drawRoundRect(mIndicatorRect, mIndicatorCornerRadius, mIndicatorCornerRadius, mPaint);
         }
     }
+
     public static class Tab {
         private LqhTabItemView lqhTabItemView;
         private View customView;
@@ -529,7 +538,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         this.post(new Runnable() {
             @Override
             public void run() {
-                judgeSelected(LqhTabLayout.this.mCurrentTabPosition,mCurrentTabPosition);
+                judgeSelected(LqhTabLayout.this.mCurrentTabPosition, mCurrentTabPosition);
             }
         });
 
@@ -545,10 +554,11 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         @Override
         public void onClick(View v) {
             //判断有没有打断
-            judgeSelected(mCurrentTabPosition,clickPosition);
+            judgeSelected(mCurrentTabPosition, clickPosition);
         }
     }
-    public void  judgeSelected(int oldPosition,int newPosition){
+
+    public void judgeSelected(int oldPosition, int newPosition) {
         if (onInterruptListener == null || onInterruptListener.onInterrupt(newPosition)) {
             if (mViewPager != null) {
                 //如果还是同个页签，使用setCurrentItem不会回调OnPageSelected(),所以在此处需要回调点击监听
@@ -556,19 +566,19 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
                     onPageSelected(newPosition);
                 } else {
                     //false：代表快速切换 true：表示切换速度慢
-                    if(mIndicatorAnimEnable){
+                    if (mIndicatorAnimEnable) {
                         mViewPager.setCurrentItem(newPosition, true);
-                    }else{
+                    } else {
                         mViewPager.setCurrentItem(newPosition, false);
                     }
                 }
             } else {
                 //是否要动画
-                if(!mIndicatorAnimEnable||oldPosition == newPosition){
+                if (!mIndicatorAnimEnable || oldPosition == newPosition) {
                     onPageSelected(newPosition);
-                }else{
+                } else {
                     //开始动画
-                    starAnimator(oldPosition,newPosition);
+                    starAnimator(oldPosition, newPosition);
                 }
 
             }
@@ -591,6 +601,7 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         mScrollAnimator.start();
         onPageSelected(newPosition);
     }
+
     private ValueAnimator.AnimatorUpdateListener mAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
@@ -646,10 +657,10 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
                 data.mTop = tabs.get(i).getLqhTabItemView().getTop();
                 data.mRight = tabs.get(i).getLqhTabItemView().getRight();
                 data.mBottom = tabs.get(i).getLqhTabItemView().getBottom();
-                data.mContentLeft = data.mLeft+data.width()/2-tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth()/2;
+                data.mContentLeft = data.mLeft + data.width() / 2 - tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth() / 2;
                 data.mContentTop = data.mTop;
-                data.mContentRight = data.mLeft+data.width()/2+tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth()/2;
-                data.mContentBottom =  data.mBottom;
+                data.mContentRight = data.mLeft + data.width() / 2 + tabs.get(i).getLqhTabItemView().getTvTabTitle().getWidth() / 2;
+                data.mContentBottom = data.mBottom;
             } else {
                 data.mLeft = tabs.get(i).getCustomView().getLeft();
                 data.mTop = tabs.get(i).getCustomView().getTop();
@@ -663,10 +674,11 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
             mPositionDataList.add(data);
         }
     }
-    public  void addTabItemDataList(List<TabItemData> datas){
+
+    public void addTabItemDataList(List<TabItemData> datas) {
         tabs.clear();
         linContent.removeAllViews();
-        for(TabItemData data:datas){
+        for (TabItemData data : datas) {
             LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this.getContext());
             LqhTabItemView lqhTabItemView = builder.setSelectedIcon(data.getSelectedIcon())
                     .setNormalIcon(data.getNormalIcon())
@@ -698,8 +710,15 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         super.onSizeChanged(w, h, oldw, oldh);
         Log.e(TAG, "onSizeChanged");
     }
-    private void UpdateTabItemViewStyle(){
 
+    private void UpdateTabItemViewStyle() {
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                if (tabs.get(i).getLqhTabItemView() != null) {
+                    tabs.get(i).getLqhTabItemView().updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
 
@@ -707,10 +726,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
         return isScrollMode;
     }
 
-//    public void setScrollMode(boolean scrollMode) {
-//        isScrollMode = scrollMode;
-//        initInnerContentView();
-//    }
+    public void setScrollMode(boolean scrollMode) {
+        isScrollMode = scrollMode;
+        this.removeAllViews();
+        initInnerContentView();
+        for (int i = 0; i < tabs.size(); i++) {
+            configTabItemView(tabs.get(i));
+            addTaItemView(tabs.get(i).getCustomView() == null ? tabs.get(i).getLqhTabItemView() : tabs.get(i).getCustomView());
+        }
+        initialise();
+    }
 
     public boolean isSpaceEqual() {
         return isSpaceEqual;
@@ -718,6 +743,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setSpaceEqual(boolean spaceEqual) {
         isSpaceEqual = spaceEqual;
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) lqhTabItemView.getLayoutParams();
+                    lqhTabItemView.setLayoutParams(getInitLayoutParams(layoutParams));
+                }
+            }
+
+        }
     }
 
     public int getNormalColor() {
@@ -726,6 +761,15 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setNormalColor(int normalColor) {
         this.normalColor = normalColor;
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setNormalColor(normalColor);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getSelectedColor() {
@@ -734,6 +778,15 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setSelectedColor(int selectedColor) {
         this.selectedColor = selectedColor;
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setSelectedColor(selectedColor);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getNormalTextSize() {
@@ -741,7 +794,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setNormalTextSize(int normalTextSize) {
-        this.normalTextSize = normalTextSize;
+        this.normalTextSize = UIUtils.sp2px(context, normalTextSize);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setNormalTextSize(normalTextSize);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getSelectedTextSize() {
@@ -749,7 +811,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setSelectedTextSize(int selectedTextSize) {
-        this.selectedTextSize = selectedTextSize;
+        this.selectedTextSize = UIUtils.sp2px(context, selectedTextSize);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setSelectedTextSize(selectedTextSize);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getIconMargin() {
@@ -757,7 +828,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setIconMargin(int iconMargin) {
-        this.iconMargin = iconMargin;
+        this.iconMargin = UIUtils.dp2px(context, iconMargin);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setIconMargin(iconMargin);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getUnReadTextSize() {
@@ -765,7 +845,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setUnReadTextSize(int unReadTextSize) {
-        this.unReadTextSize = unReadTextSize;
+        this.unReadTextSize = UIUtils.sp2px(context, unReadTextSize);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setUnReadTextSize(unReadTextSize);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getUnreadTextColor() {
@@ -774,6 +863,15 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setUnreadTextColor(int unreadTextColor) {
         this.unreadTextColor = unreadTextColor;
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setUnreadTextColor(unreadTextColor);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getUnreadTextBg() {
@@ -782,6 +880,15 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
 
     public void setUnreadTextBg(int unreadTextBg) {
         this.unreadTextBg = unreadTextBg;
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setUnreadTextBg(unreadTextBg);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getItemPadTB() {
@@ -789,7 +896,16 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setItemPadTB(int itemPadTB) {
-        this.itemPadTB = itemPadTB;
+        this.itemPadTB = UIUtils.dp2px(context, itemPadTB);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setItemPadTB(itemPadTB);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
 
     public int getItemPadLR() {
@@ -797,8 +913,18 @@ public class LqhTabLayout extends FrameLayout implements IPagerChangeListener, L
     }
 
     public void setItemPadLR(int itemPadLR) {
-        this.itemPadLR = itemPadLR;
+        this.itemPadLR = UIUtils.dp2px(context, itemPadLR);
+        for (int i = 0; i < linContent.getChildCount(); i++) {
+            if (i < tabs.size()) {
+                LqhTabItemView lqhTabItemView = tabs.get(i).getLqhTabItemView();
+                if (lqhTabItemView != null) {
+                    lqhTabItemView.setItemPadLR(itemPadLR);
+                    lqhTabItemView.updateStyle(i == mCurrentTabPosition);
+                }
+            }
+        }
     }
+
     //==========================
     public Interpolator getmStartInterpolator() {
         return mStartInterpolator;

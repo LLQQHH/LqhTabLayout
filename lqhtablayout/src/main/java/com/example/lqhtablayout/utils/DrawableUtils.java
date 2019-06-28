@@ -49,10 +49,10 @@ public class DrawableUtils {
         }
         gradientDrawable.setGradientType(GradientDrawable.RECTANGLE);//设置渐变样式
         if (radiusDp > 0) {
-            gradientDrawable.setCornerRadius(UIUtils.dip2Px(context, radiusDp));
+            gradientDrawable.setCornerRadius(UIUtils.dp2px(context, radiusDp));
         }
         if (strokeDp > 0) {
-            gradientDrawable.setStroke(UIUtils.dip2Px(context, strokeDp), strokeColor);
+            gradientDrawable.setStroke(UIUtils.dp2px(context, strokeDp), strokeColor);
         }
         return gradientDrawable;
     }

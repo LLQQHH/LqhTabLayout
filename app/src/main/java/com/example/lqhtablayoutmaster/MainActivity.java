@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             lists.add(data);
 //              LqhTabItemView.Builder builder = new LqhTabItemView.Builder(this);
 //              builder.setItemText("测试"+(i+1));
-//              builder.setItemPadTB(UIUtils.dip2Px(this,5));
+//              builder.setItemPadTB(UIUtils.dp2px(this,5));
 //              if(i%2==0){
 //                  builder.setSelectedIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_pitchon));
 //                  builder.setNormalIcon(UIUtils.getDrawable(this,R.drawable.ic_main_msg_normalcy));
