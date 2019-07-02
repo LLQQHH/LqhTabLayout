@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center">
-        <com.example.lqhtablayout.LqhTabLayout
+        <com.lqh.lqhtablayout.LqhTabLayout
             android:clipChildren="false"
             android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
@@ -27,41 +27,41 @@
             android:background="@color/c_F6CE59"
             app:lqh_itemPadContentLR="10dp"
             >
-            <com.example.lqhtablayout.LqhTabItemView
+            <com.lqh.lqhtablayout.LqhTabItemView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:itemText="测1"
                 app:itemNormalIcon="@drawable/ic_main_msg_normalcy"
                 app:itemSelectedIcon="@drawable/ic_main_msg_pitchon" />
-            <com.example.lqhtablayout.LqhTabItemView
+            <com.lqh.lqhtablayout.LqhTabItemView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemText="测试2"
                 app:itemNormalIcon="@drawable/ic_main_msg_normalcy"
                 app:itemSelectedIcon="@drawable/ic_main_msg_pitchon"
                 />
-            <com.example.lqhtablayout.LqhTabItemView
+            <com.lqh.lqhtablayout.LqhTabItemView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:itemText="测3"
                 app:itemNormalIcon="@drawable/ic_main_address_normalcy"
                 app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-            <com.example.lqhtablayout.LqhTabItemView
+            <com.lqh.lqhtablayout.LqhTabItemView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:itemText="测4"
                 app:itemNormalIcon="@drawable/ic_main_address_normalcy"
                 app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-            <com.example.lqhtablayout.LqhTabItemView
+            <com.lqh.lqhtablayout.LqhTabItemView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:itemText="测5"
                 app:itemNormalIcon="@drawable/ic_main_address_normalcy"
                 app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-        </com.example.lqhtablayout.LqhTabLayout>
+        </com.lqh.lqhtablayout.LqhTabLayout>
     </LinearLayout>
 
-    <com.example.lqhtablayout.LqhTabLayout
+    <com.lqh.lqhtablayout.LqhTabLayout
         android:clipChildren="false"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
@@ -77,7 +77,7 @@
         android:background="@color/c_F6CE59"
 
         >
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测1"
@@ -85,33 +85,33 @@
             app:itemSelectedIcon="@drawable/ic_main_msg_pitchon"
             app:itemSelectedColor="@color/c_222831"
             app:itemNormalTextColor="@color/c0"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:itemText="测试2"
             app:itemNormalIcon="@drawable/ic_main_msg_normalcy"
             app:itemSelectedIcon="@drawable/ic_main_msg_pitchon"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测3"
             app:itemNormalIcon="@drawable/ic_main_address_normalcy"
             app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测4"
             app:itemNormalIcon="@drawable/ic_main_address_normalcy"
             app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测5"
             app:itemNormalIcon="@drawable/ic_main_address_normalcy"
             app:itemSelectedIcon="@drawable/ic_main_address_pitchon" />
-    </com.example.lqhtablayout.LqhTabLayout>
-    <com.example.lqhtablayout.LqhTabLayout
+    </com.lqh.lqhtablayout.LqhTabLayout>
+    <com.lqh.lqhtablayout.LqhTabLayout
         android:clipChildren="false"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
@@ -126,7 +126,7 @@
         app:lqh_indicator_model="1"
         android:background="@color/c_F6CE59"
         >
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测1"
@@ -138,7 +138,7 @@
             app:itemPadContentLR="35dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:itemText="测试2"
@@ -151,7 +151,7 @@
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测3"
@@ -163,7 +163,7 @@
             app:itemPadContentLR="35dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测4"
@@ -175,7 +175,7 @@
             app:itemPadContentLR="35dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测5"
@@ -187,8 +187,8 @@
             app:itemPadContentLR="35dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-    </com.example.lqhtablayout.LqhTabLayout>
-    <com.example.lqhtablayout.LqhTabLayout
+    </com.lqh.lqhtablayout.LqhTabLayout>
+    <com.lqh.lqhtablayout.LqhTabLayout
         android:clipChildren="false"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
@@ -203,7 +203,7 @@
         android:background="@color/c_009688"
         app:lqh_indicator_model="1"
         >
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测1"
@@ -216,7 +216,7 @@
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:itemText="测试2"
@@ -229,7 +229,7 @@
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测3"
@@ -241,7 +241,7 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测4"
@@ -253,7 +253,7 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测5"
@@ -265,8 +265,8 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-    </com.example.lqhtablayout.LqhTabLayout>
-    <com.example.lqhtablayout.LqhTabLayout
+    </com.lqh.lqhtablayout.LqhTabLayout>
+    <com.lqh.lqhtablayout.LqhTabLayout
         android:clipChildren="false"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
@@ -280,7 +280,7 @@
         app:lqh_indicator_corner_radius="2dp"
         android:background="@color/c_009688"
         >
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测1"
@@ -293,7 +293,7 @@
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:itemText="测试2"
@@ -306,7 +306,7 @@
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"
             />
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测3"
@@ -318,7 +318,7 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测4"
@@ -330,7 +330,7 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-        <com.example.lqhtablayout.LqhTabItemView
+        <com.lqh.lqhtablayout.LqhTabItemView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:itemText="测5"
@@ -342,8 +342,8 @@
             app:itemPadContentLR="10dp"
             app:itemNormalTextColor="@color/white"
             app:itemSelectedColor="@color/red"/>
-    </com.example.lqhtablayout.LqhTabLayout>
-    <com.example.lqhtablayout.LqhTabLayout
+    </com.lqh.lqhtablayout.LqhTabLayout>
+    <com.lqh.lqhtablayout.LqhTabLayout
         android:clipChildren="false"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
@@ -359,7 +359,7 @@
         app:lqh_itemContentPadTB="10dp"
         app:lqh_itemPadContentLR="10dp"
         >
-    </com.example.lqhtablayout.LqhTabLayout>
+    </com.lqh.lqhtablayout.LqhTabLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp"

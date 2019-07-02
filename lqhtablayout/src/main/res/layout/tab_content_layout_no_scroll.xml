@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.lqhtablayout.widget.LqhLinearLayout
+    <com.lqh.lqhtablayout.widget.LqhLinearLayout
         android:id="@+id/lin_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
